@@ -1,4 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 var url = "mongodb://localhost:27017/";
 class BlogService{
     
@@ -14,33 +15,23 @@ class BlogService{
 
     }
 
-    getPost(){
+    getPost(cb){
         this.dbo.collection("posts").find({}).toArray((err, result) => {
             if(err) throw err;
-            console.log("getPost")
-            console.log(result);
+            cb(result);
         })
 
     }
 
-    getPostById(){
-        this.dbo.collection("posts").find({} , { title: "hello" }).toArray((err, result) => {
+    getPostById(id, cb){
+        console.log('id', id);
+        this.dbo.collection("posts").findOne({ _id: ObjectID(id) }, (err, result) => {
             if(err) throw err;
-            console.log("By ID");
-            console.log(result);
+            cb(result);
         })
     }
 }
 
+module.exports = BlogService;
 
-MongoClient.connect(url, (err, db) =>{
-    if(err) throw err;
-    var post = { title:"hello" , date: 12/12/12 , description: "abcd applet"};
-    var dbo = db.db("blog");
-    var obj = new BlogService(dbo);
-//obj.uploadPost(post);
-obj.getPost();
-obj.getPostById();
-
-})
 
